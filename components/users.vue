@@ -63,7 +63,7 @@
                   </v-row>
                   <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn @click="dialog = false">
+                    <v-btn @click="closeFormModal">
                       close
                     </v-btn>
                     <v-btn
@@ -83,6 +83,7 @@
     </v-card-title>
     <v-card-text>
       <v-dialog
+        v-if="items && items.length"
         v-model="dialogLength"
         width="300"
       >
@@ -98,7 +99,7 @@
           <v-card-title>
             Number of items
           </v-card-title>
-          <v-card-text>
+          <v-card-text v-if="items.length">
             Quantity: {{ items.length }}
           </v-card-text>
 
@@ -116,36 +117,34 @@
         </v-card>
       </v-dialog>
       <v-list three-line>
-        <template v-if="items.length">
-          <template v-for="(item, index) in items">
-            <v-divider
+        <template v-for="(item, index) in items">
+          <v-divider
               v-if="index !== 0 && index !== items.length"
               :key="index"
               inset
-            ></v-divider>
-            <v-list-item
+          ></v-divider>
+          <v-list-item
               :key="item.name + index"
-            >
-              <v-list-item-group>
-                <v-img class="rounded-circle mr-6" width="50" :src="item.avatar.length ? item.avatar : imgPlaceholder"></v-img>
-              </v-list-item-group>
+          >
+            <v-list-item-group>
+              <v-img class="rounded-circle mr-6" width="50" :src="item.avatar ? item.avatar : imgPlaceholder"></v-img>
+            </v-list-item-group>
 
-              <v-list-item-content>
-                <v-list-item-title v-html="item.name"></v-list-item-title>
-                <v-list-item-subtitle v-html="item.jobTitle"></v-list-item-subtitle>
-              </v-list-item-content>
+            <v-list-item-content>
+              <v-list-item-title v-html="item.name"></v-list-item-title>
+              <v-list-item-subtitle v-html="item.jobTitle"></v-list-item-subtitle>
+            </v-list-item-content>
 
-              <v-list-item-group>
-                <v-btn @click="deleteItem(index)">
-                  <v-icon>
-                    {{ icons.mdiDelete }}
-                  </v-icon>
-                </v-btn>
-              </v-list-item-group>
-            </v-list-item>
-          </template>
+            <v-list-item-group>
+              <v-btn @click="deleteItem(index)">
+                <v-icon>
+                  {{ icons.mdiDelete }}
+                </v-icon>
+              </v-btn>
+            </v-list-item-group>
+          </v-list-item>
         </template>
-        <template v-else>
+        <template v-if="items && !items.length">
           <v-col class="text-center">
             <p>The list is empty. Add a user.</p>
           </v-col>
@@ -162,6 +161,7 @@ import {
     mdiPlus
 } from '@mdi/js';
 import confirm from './confirm.vue';
+import {mapGetters} from "vuex";
 
 const urlReg = /^(http[s]*:\/\/)([a-z\-_0-9/.]+)\.([a-z.]{2,3})\/([a-z0-9\-_/._~:?#[\]@!$&'()*+,;=%]*)([a-z0-9]+\.)(jpg|jpeg|png)/i;
 export default {
@@ -192,9 +192,15 @@ export default {
         }
     }),
     computed: {
-        items() { return this.$store.getters.getItems; }
+        ...mapGetters({
+            items: 'store/getItems'
+        })
     },
     methods: {
+        closeFormModal() {
+            this.dialog = false;
+            this.$refs.form.reset();
+        },
         deleteItem(index) {
             this.$refs.confirmRef.open('Delete', 'Are you sure?', { color: 'red' }).then((res) => {
                 if (res) this.$store.commit('store/DELETE_ITEM', index);
