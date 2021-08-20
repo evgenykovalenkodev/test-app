@@ -17,10 +17,10 @@ export default {
         getItems: (state) => state.items
     },
     mutations: {
-        DELETE_ITEM(state, payload) {
+        deleteItem(state, payload) {
             state.items.splice(payload, 1);
         },
-        ADD_ITEM(state, payload) {
+        addItem(state, payload) {
             state.items.push(payload);
         }
     }

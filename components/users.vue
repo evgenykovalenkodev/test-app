@@ -203,13 +203,13 @@ export default {
         },
         deleteItem(index) {
             this.$refs.confirmRef.open('Delete', 'Are you sure?', { color: 'red' }).then((res) => {
-                if (res) this.$store.commit('store/DELETE_ITEM', index);
+                if (res) this.$store.commit('store/deleteItem', index);
             });
         },
         save() {
             const valid = this.$refs.form.validate();
             if (valid) {
-                this.$store.commit('store/ADD_ITEM', JSON.parse(JSON.stringify(this.models)));
+                this.$store.commit('store/addItem', JSON.parse(JSON.stringify(this.models)));
                 this.$refs.form.reset();
                 this.dialog = false;
             }
